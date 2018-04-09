@@ -23,4 +23,8 @@ public class References
     public static final String STRING_BUTTON_SUBMIT_TEXT = "Submit";
     public static final String STRING_BUTTON_ANALYSE_TEXT = "Analyse";
     
+    // Keys
+    public static final String STRING_TWITTER_CONSUMER_KEY = "dhviARgBWqKzjV7A8K5n5NdGs";
+    public static final String STRING_TWITTER_CONSUMER_SECRET = "O1aRZuoIyH5F7t3LrUlxhKnmaiIugHwdaeiUbvgzopVnqDP3j7";
+    
 }

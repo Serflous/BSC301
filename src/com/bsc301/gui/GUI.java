@@ -5,6 +5,8 @@
  */
 package com.bsc301.gui;
 
+import com.bsc301.socialmedia.FacebookLoader;
+import com.bsc301.socialmedia.TwitterLoader;
 import com.bsc301.util.References;
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -20,6 +22,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpringLayout;
+import twitter4j.ResponseList;
+import twitter4j.Status;
 
 /**
  *
@@ -148,15 +152,29 @@ public class GUI extends JFrame
     public class DefaultButtonActionListener implements ActionListener
     {
         
+        @Override
         public void actionPerformed(ActionEvent e)
         {
             if(e.getSource() == btnFacebookAuthToken)
             {
-                
+                String authToken = txtFacebookAuthToken.getText();
+                txtHelpSuggestions.setText(FacebookLoader.GetInstance().GetFacebookJsonString(authToken).toString());
             }
             if(e.getSource() == btnTwitterUsername)
             {
-                
+                String username = txtTwitterUsername.getText();
+                ResponseList<Status> statuses = TwitterLoader.GetInstance().GetStatuses(username);
+                if(statuses == null)
+                {
+                    txtHelpSuggestions.append("Twitter failure");
+                }
+                else
+                {
+                    for(Status status : statuses)
+                    {
+                        txtHelpSuggestions.append(status.getText() + '\n');
+                    }
+                }
             }
         }
         
