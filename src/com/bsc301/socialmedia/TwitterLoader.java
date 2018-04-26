@@ -6,6 +6,9 @@
 package com.bsc301.socialmedia;
 
 import com.bsc301.util.References;
+import java.util.ArrayList;
+import java.util.List;
+import twitter4j.Paging;
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -35,21 +38,44 @@ public class TwitterLoader
         
     }
     
-    public ResponseList<Status> GetStatuses(String username)
+    public List<Status> GetStatuses(String username, boolean includeRetweets)
     {
-        ResponseList<Status> statuses = null;
+        ArrayList<Status> returnStatuses = new ArrayList<>();
         try
         {
             ConfigurationBuilder builder = new ConfigurationBuilder();
             builder.setDebugEnabled(true)
                    .setOAuthConsumerKey(References.STRING_TWITTER_CONSUMER_KEY)
                    .setOAuthConsumerSecret(References.STRING_TWITTER_CONSUMER_SECRET)
-                   .setApplicationOnlyAuthEnabled(true);
+                   .setApplicationOnlyAuthEnabled(true)
+                   .setTweetModeExtended(true);
 
             TwitterFactory tf = new TwitterFactory(builder.build());
             Twitter twitterInstance = tf.getInstance();
             OAuth2Token token = twitterInstance.getOAuth2Token();
-            statuses = twitterInstance.getUserTimeline(username);
+            int currentPageIndex = 1;
+            int currentSize = 0;
+            ResponseList<Status> statuses;
+            do
+            {
+                Paging currentPage = new Paging(currentPageIndex++, 100);
+                statuses = twitterInstance.getUserTimeline(username, currentPage);
+                for(Status status : statuses)
+                {
+                    if(includeRetweets)
+                    {
+                        returnStatuses.add(status);
+                    }
+                    else
+                    {
+                        if(!status.isRetweet())
+                        {
+                            returnStatuses.add(status);
+                        }
+                    }
+                }
+            }
+            while(statuses.size() > 0);
         }
         catch(Exception ex)
         {
@@ -57,8 +83,13 @@ public class TwitterLoader
         }
         finally
         {
-            return statuses;
+            return returnStatuses;
         }
+    }
+    
+    public List<Status> GetStatuses(String username)
+    {
+        return GetStatuses(username, false);
     }
     
     

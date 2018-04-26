@@ -5,10 +5,14 @@
  */
 package com.bsc301.socialmedia;
 
+import com.restfb.Connection;
 import com.restfb.DefaultFacebookClient;
 import com.restfb.FacebookClient;
 import com.restfb.Version;
 import com.restfb.json.JsonObject;
+import com.restfb.types.Post;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -32,10 +36,34 @@ public class FacebookLoader
         
     }
     
-    public JsonObject GetFacebookJsonString(String authToken)
+    public List<Post> GetFacebookJsonString(String authToken)
     {
-        FacebookClient client = new DefaultFacebookClient(authToken, Version.LATEST);
-        return client.fetchObject("me/posts", JsonObject.class);
+        ArrayList<Post> allPosts = new ArrayList<>();
+        try
+        {
+            FacebookClient client = new DefaultFacebookClient(authToken, Version.LATEST);
+            //return client.fetchObject("me/posts", JsonObject.class);
+            Connection<Post> feed = client.fetchConnection("me/feed", Post.class);
+            for(List<Post> page : feed)
+            {
+                for(Post post : page)
+                {
+                    if(post.getMessage() != null)
+                    {
+                        allPosts.add(post);
+                    }
+                }
+            }
+            return allPosts;
+        }
+        catch(Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        finally
+        {
+            return allPosts;
+        }
     }
     
     

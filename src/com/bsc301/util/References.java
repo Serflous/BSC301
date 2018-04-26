@@ -22,6 +22,8 @@ public class References
     public static final String STRING_HELP_TITLE = "Help/Suggestions.";
     public static final String STRING_BUTTON_SUBMIT_TEXT = "Submit";
     public static final String STRING_BUTTON_ANALYSE_TEXT = "Analyse";
+    public static final String STRING_BUTTON_LOADING_TEXT = "Loading...";
+    public static final String STRING_BUTTON_READY_TEXT = "Ready";
     
     // Keys
     public static final String STRING_TWITTER_CONSUMER_KEY = "dhviARgBWqKzjV7A8K5n5NdGs";
