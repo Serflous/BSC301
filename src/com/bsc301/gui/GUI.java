@@ -5,22 +5,28 @@
  */
 package com.bsc301.gui;
 
+import com.bsc301.analytical.SentenceSplitter;
 import com.bsc301.socialmedia.FacebookLoader;
 import com.bsc301.socialmedia.TwitterLoader;
 import com.bsc301.util.References;
+import com.restfb.types.Post;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SpringLayout;
 import twitter4j.ResponseList;
 import twitter4j.Status;
@@ -59,6 +65,9 @@ public class GUI extends JFrame
     private JPanel pnlHelpPanel = new JPanel(new BorderLayout());
     private JSplitPane pnlSplitPanel = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pnlPotentialPhobiaPanel, pnlHelpPanel);
     
+    // Scroll Panes
+    private JScrollPane sclMessageBox = new JScrollPane(txtHelpSuggestions, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+    
     // Layout Manager
     private SpringLayout lomSpring = new SpringLayout();
     
@@ -89,7 +98,7 @@ public class GUI extends JFrame
         pnlPotentialPhobiaPanel.add(lstPotentialPhobias, BorderLayout.CENTER);
         pnlPotentialPhobiaPanel.add(lblPotentialPhobiaTitle, BorderLayout.NORTH);
         
-        pnlHelpPanel.add(txtHelpSuggestions, BorderLayout.CENTER);
+        pnlHelpPanel.add(sclMessageBox, BorderLayout.CENTER);
         pnlHelpPanel.add(lblHelpSuggestionsTitle, BorderLayout.NORTH);
         
         // Facebook title
@@ -100,7 +109,7 @@ public class GUI extends JFrame
         // Facebook auth token button
         lomSpring.putConstraint(SpringLayout.NORTH, btnFacebookAuthToken, 5, SpringLayout.SOUTH, lblAuthCodeTitle);
         lomSpring.putConstraint(SpringLayout.EAST, btnFacebookAuthToken, -5, SpringLayout.EAST, pane);
-        lomSpring.putConstraint(SpringLayout.WEST, btnFacebookAuthToken, -85, SpringLayout.EAST, pane);
+        lomSpring.putConstraint(SpringLayout.WEST, btnFacebookAuthToken, -95, SpringLayout.EAST, pane);
         
         // Facebook text
         lomSpring.putConstraint(SpringLayout.WEST, txtFacebookAuthToken, 5, SpringLayout.WEST, pane);
@@ -116,7 +125,7 @@ public class GUI extends JFrame
         // Twitter username button
         lomSpring.putConstraint(SpringLayout.NORTH, btnTwitterUsername, 5, SpringLayout.SOUTH, lblTwitterUsernameTitle);
         lomSpring.putConstraint(SpringLayout.EAST, btnTwitterUsername, -5, SpringLayout.EAST, pane);
-        lomSpring.putConstraint(SpringLayout.WEST, btnTwitterUsername, -85, SpringLayout.EAST, pane);
+        lomSpring.putConstraint(SpringLayout.WEST, btnTwitterUsername, -95, SpringLayout.EAST, pane);
         
         // Twitter text
         lomSpring.putConstraint(SpringLayout.WEST, txtTwitterUsername, 5, SpringLayout.WEST, pane);
@@ -140,6 +149,8 @@ public class GUI extends JFrame
         DefaultButtonActionListener alButtons = new DefaultButtonActionListener();
         btnFacebookAuthToken.addActionListener(alButtons);
         btnTwitterUsername.addActionListener(alButtons);
+        
+        setAnalyseEnabled();
     }
     
     public void flipVisibility()
@@ -147,6 +158,17 @@ public class GUI extends JFrame
         this.setVisible(!this.isVisible());
     }
     
+    public void setAnalyseEnabled()
+    {
+        if(!(btnFacebookAuthToken.isEnabled() && btnTwitterUsername.isEnabled()))
+        {
+            btnAnalyse.setEnabled(true);
+        }
+        else
+        {
+            btnAnalyse.setEnabled(false);
+        }
+    }
     
     
     public class DefaultButtonActionListener implements ActionListener
@@ -157,24 +179,70 @@ public class GUI extends JFrame
         {
             if(e.getSource() == btnFacebookAuthToken)
             {
-                String authToken = txtFacebookAuthToken.getText();
-                txtHelpSuggestions.setText(FacebookLoader.GetInstance().GetFacebookJsonString(authToken).toString());
+                btnFacebookAuthToken.setText(References.STRING_BUTTON_LOADING_TEXT);
+                btnFacebookAuthToken.setEnabled(false);
+                Thread t = new Thread(new FacebookThread());
+                t.start();
             }
             if(e.getSource() == btnTwitterUsername)
             {
+                btnTwitterUsername.setText(References.STRING_BUTTON_LOADING_TEXT);
+                btnTwitterUsername.setEnabled(false);
+                Thread t = new Thread(new TwitterThread());
+                t.start();
+            }
+        }
+        
+        public class FacebookThread implements Runnable
+        {
+
+            @Override
+            public void run()
+            {
+                String authToken = txtFacebookAuthToken.getText();
+                List<Post> posts = FacebookLoader.GetInstance().GetFacebookJsonString(authToken);
+                List<String> sentences = SentenceSplitter.GetInstance().GenerateSentences(posts);
+                
+                for(int i = 1; i < sentences.size(); i++)
+                {
+                    String post = sentences.get(i - 1);
+                    txtHelpSuggestions.append("-------------------------------------------------------------------------------------------\n");
+                    txtHelpSuggestions.append("Sentence No: " + i + '\n');
+                    txtHelpSuggestions.append(post + '\n');
+                    txtHelpSuggestions.append("-------------------------------------------------------------------------------------------\n\n");
+                }
+                btnFacebookAuthToken.setText(References.STRING_BUTTON_READY_TEXT);
+                setAnalyseEnabled();
+            }
+            
+        }
+        
+        public class TwitterThread implements Runnable
+        {
+            @Override
+            public void run()
+            {
                 String username = txtTwitterUsername.getText();
-                ResponseList<Status> statuses = TwitterLoader.GetInstance().GetStatuses(username);
+                List<Status> statuses = TwitterLoader.GetInstance().GetStatuses(username);
                 if(statuses == null)
                 {
                     txtHelpSuggestions.append("Twitter failure");
                 }
                 else
                 {
-                    for(Status status : statuses)
+                    List<String> sentences = SentenceSplitter.GetInstance().GenerateSentences(statuses);
+                    
+                    for(int i = 1; i <= sentences.size(); i++)
                     {
-                        txtHelpSuggestions.append(status.getText() + '\n');
+                        String status = sentences.get(i - 1);
+                        txtHelpSuggestions.append("-------------------------------------------------------------------------------------------\n");
+                        txtHelpSuggestions.append("Sentence No: " + i + '\n');
+                        txtHelpSuggestions.append(status+ '\n');
+                        txtHelpSuggestions.append("-------------------------------------------------------------------------------------------\n\n");
                     }
                 }
+                btnTwitterUsername.setText(References.STRING_BUTTON_READY_TEXT);
+                setAnalyseEnabled();
             }
         }
         
