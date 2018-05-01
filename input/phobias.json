@@ -1,0 +1,77 @@
+[
+	{
+		"phobia": "Arachnophobia",
+		"desc": "Fear of spiders.",
+		"words": ["spider","tarantula"]
+	},
+	{
+		"phobia": "Ophidiophobia",
+		"desc": "Fear of snakes.",
+		"words": ["snake"]
+	},
+	{
+		"phobia": "Acrophobia",
+		"desc": "Fear of heights.",
+		"words": ["high","elevator"]
+	},
+	{
+		"phobia": "Necrophobia",
+		"desc": "Fear of death.",
+		"words": ["death"]
+	},	
+	{
+		"phobia": "Cynophobia",
+		"desc": "Fear of dogs.",
+		"words": ["dog","puppy"]
+	},
+	{
+		"phobia": "Claustrophobia",
+		"desc": "Fear of confined spaces.",
+		"words": ["inside","small","confined"]
+	},
+	{
+		"phobia": "Coulrophobia",
+		"desc": "Fear of clowns.",
+		"words": ["clown","circus"]
+	},
+	{
+		"phobia": "Pediophobia",
+		"desc": "Fear of dolls.",
+		"words": ["doll","toy"]
+	},
+	{
+		"phobia": "Hemophobia",
+		"desc": "Fear of blood.",
+		"words": ["blood","bleeding"]
+	},
+	{
+		"phobia": "Glossaphobia",
+		"desc": "Fear of public speaking.",
+		"words": ["public speaking","speech"]
+	},
+	{
+		"phobia": "Nyctophobia",
+		"desc": "Fear of darkness.",
+		"words": ["dark","night"]
+	},
+	{
+		"phobia": "Trypanophobia",
+		"desc": "Fear of needles.",
+		"words": ["needle","inject"]
+	},	
+	{
+		"phobia": "Agoraphobia",
+		"desc": "Fear of open places.",
+		"words": ["outside","public","crowded"]
+	},
+	{
+		"phobia": "Pteromerhanophobia",
+		"desc": "Fear of flying.",
+		"words": ["flying","aeroplane"]
+	},
+	{
+		"phobia": "Mysophobia",
+		"desc": "Fear of germs.",
+		"words": ["germs","unclean"]
+	}
+]
