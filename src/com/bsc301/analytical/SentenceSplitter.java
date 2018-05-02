@@ -37,7 +37,10 @@ public class SentenceSplitter
         
         for(T post : posts)
         {
+            // Gets post or status text
             String message = post instanceof Post ? ((Post)post).getMessage() : ((Status)post).getText();
+            
+            // Split post on '.'
             String[] sentenceArray = message.split("\\.");
             for(String sentence : sentenceArray)
             {
