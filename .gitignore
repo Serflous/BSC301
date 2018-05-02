@@ -5,3 +5,8 @@ build.xml
 *.mf
 *.swp
 /dist/
+libs/CopyLibs/
+
+libs/nblibraries\.properties
+
+libs/stanford-corenlp-full-2018-02-27/
