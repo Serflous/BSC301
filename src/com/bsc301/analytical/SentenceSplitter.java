@@ -13,6 +13,7 @@ import twitter4j.Status;
 /**
  *
  * @author 32974146
+ * @author peterd - 32455678
  */
 public class SentenceSplitter
 {
@@ -26,22 +27,38 @@ public class SentenceSplitter
         return me;
     }
     
+    // Restrict class construction
     private SentenceSplitter()
     {
         
     }
+
+    /**
+     * Get text from either Facebook post or Twitter status.
+     * 
+     * @param <T> Type of post
+     * @param post Post to get text from
+     * @return String of Post text
+     */
+    private <T> String GetPostText(T post) {
+        String message = post instanceof Post ? ((Post)post).getMessage() : ((Status)post).getText();
+        return message;
+    }
     
-    public <T> List<String> GenerateSentences(List<T> posts)
+    /**
+     * Separate list of strings into new list of strings on period character.
+     * 
+     * @param strings List of strings
+     * @return List of strings separated
+     */
+    public List<String> GenerateSentences(List<String> strings)
     {
         ArrayList<String> sentences = new ArrayList<>();
         
-        for(T post : posts)
+        for(String string : strings)
         {
-            // Gets post or status text
-            String message = post instanceof Post ? ((Post)post).getMessage() : ((Status)post).getText();
-            
-            // Split post on '.'
-            String[] sentenceArray = message.split("\\.");
+            // Split text on '.'
+            String[] sentenceArray = string.split("\\.");
             for(String sentence : sentenceArray)
             {
                 sentences.add(sentence);
@@ -50,5 +67,21 @@ public class SentenceSplitter
         return sentences;
     }
     
-    
+    /**
+     * Separate a list of posts into a list of sentences.
+     * 
+     * @param <T> Type of post
+     * @param posts List of posts
+     * @return List of separated strings
+     */
+    public <T> List<String> GenerateSentencesFromPosts(List<T> posts) {
+        ArrayList<String> postTexts = new ArrayList<>();
+        
+        for(T post : posts) {
+            postTexts.add(GetPostText(post));
+        }
+        
+        List<String> postSentences = GenerateSentences(postTexts);
+        return postSentences;
+    }
 }
