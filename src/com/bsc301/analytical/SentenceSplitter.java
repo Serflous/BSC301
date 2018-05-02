@@ -9,6 +9,7 @@ import com.restfb.types.Post;
 import java.util.ArrayList;
 import java.util.List;
 import twitter4j.Status;
+import edu.stanford.nlp.simple.*;
 
 /**
  *
@@ -46,42 +47,57 @@ public class SentenceSplitter
     }
     
     /**
-     * Separate list of strings into new list of strings on period character.
+     * Separate a body of text into a list of sentences.
      * 
-     * @param strings List of strings
+     * @param text Body of text
      * @return List of strings separated
      */
-    public List<String> GenerateSentences(List<String> strings)
+    public List<Sentence> GenerateSentences(String text)
     {
-        ArrayList<String> sentences = new ArrayList<>();
+        Document doc = new Document(text);
+        return(doc.sentences());
+    }
+    
+    public List<String> GenerateSentencesAsStrings(String text) {
+        ArrayList<String> strings = new ArrayList<>();
+        Document doc = new Document(text);
         
-        for(String string : strings)
-        {
-            // Split text on '.'
-            String[] sentenceArray = string.split("\\.");
-            for(String sentence : sentenceArray)
-            {
-                sentences.add(sentence);
-            }
+        for(Sentence sent : doc.sentences()) {
+            strings.add(sent.text());
         }
-        return sentences;
+        
+        return(strings);
     }
     
     /**
-     * Separate a list of posts into a list of sentences.
+     * Separate a post into a list of sentences.
      * 
      * @param <T> Type of post
-     * @param posts List of posts
-     * @return List of separated strings
+     * @param post Post
+     * @return List of sentences
+     */
+    public <T> List<Sentence> GenerateSentencesFromPost(T post) {
+        return(GenerateSentences(GetPostText(post)));
+    }
+    
+    /**
+     * Separate multiple posts by sentence into a list of strings.
+     * 
+     * @param <T> Type of post
+     * @param posts Posts
+     * @return List of strings, separated by sentence
      */
     public <T> List<String> GenerateSentencesFromPosts(List<T> posts) {
-        ArrayList<String> postTexts = new ArrayList<>();
+        ArrayList<String> strings = new ArrayList<>();
         
         for(T post : posts) {
-            postTexts.add(GetPostText(post));
+            List<Sentence> sents = GenerateSentencesFromPost(post);
+            
+            for(Sentence sent : sents) {
+                strings.add(sent.text());
+            }
         }
         
-        List<String> postSentences = GenerateSentences(postTexts);
-        return postSentences;
+        return(strings);
     }
 }
