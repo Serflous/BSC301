@@ -201,7 +201,7 @@ public class GUI extends JFrame
             {
                 String authToken = txtFacebookAuthToken.getText();
                 List<Post> posts = FacebookLoader.GetInstance().GetFacebookJsonString(authToken);
-                List<String> sentences = SentenceSplitter.GetInstance().GenerateSentences(posts);
+                List<String> sentences = SentenceSplitter.GetInstance().GenerateSentencesFromPosts(posts);
                 
                 for(int i = 1; i < sentences.size(); i++)
                 {
@@ -230,7 +230,7 @@ public class GUI extends JFrame
                 }
                 else
                 {
-                    List<String> sentences = SentenceSplitter.GetInstance().GenerateSentences(statuses);
+                    List<String> sentences = SentenceSplitter.GetInstance().GenerateSentencesFromPosts(statuses);
                     
                     for(int i = 1; i <= sentences.size(); i++)
                     {
