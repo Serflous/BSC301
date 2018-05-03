@@ -10,6 +10,7 @@ import com.bsc301.socialmedia.FacebookLoader;
 import com.bsc301.socialmedia.TwitterLoader;
 import com.bsc301.util.References;
 import com.restfb.types.Post;
+import edu.stanford.nlp.simple.Sentence;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Toolkit;
@@ -230,16 +231,22 @@ public class GUI extends JFrame
                 }
                 else
                 {
-                    List<String> sentences = SentenceSplitter.GetInstance().GenerateSentencesFromPosts(statuses);
-                    
-                    for(int i = 1; i <= sentences.size(); i++)
-                    {
-                        String status = sentences.get(i - 1);
-                        txtHelpSuggestions.append("-------------------------------------------------------------------------------------------\n");
-                        txtHelpSuggestions.append("Sentence No: " + i + '\n');
-                        txtHelpSuggestions.append(status+ '\n');
-                        txtHelpSuggestions.append("-------------------------------------------------------------------------------------------\n\n");
+                    for (Status s : statuses) {
+                        List<Sentence> sentences = SentenceSplitter.GetInstance().GenerateSentencesFromPost(s);
+                        txtHelpSuggestions.append("Post: \n");
+                        for(int i = 1; i <= sentences.size(); i++)
+                        {
+                            Sentence status = sentences.get(i - 1);
+                            txtHelpSuggestions.append("    -------------------------------------------------------------------------------------------\n");
+                            txtHelpSuggestions.append("    Sentence No: " + i + '\n');
+                            txtHelpSuggestions.append("    " + status.text() + '\n');
+                            txtHelpSuggestions.append("    -------------------------------------------------------------------------------------------\n\n");
+                        }
                     }
+                    
+                    
+                    
+                    
                 }
                 btnTwitterUsername.setText(References.STRING_BUTTON_READY_TEXT);
                 setAnalyseEnabled();
