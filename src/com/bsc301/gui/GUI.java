@@ -7,6 +7,7 @@ package com.bsc301.gui;
 
 import com.bsc301.analytical.SentenceSplitter;
 import com.bsc301.socialmedia.FacebookLoader;
+import com.bsc301.socialmedia.MasterLoader;
 import com.bsc301.socialmedia.TwitterLoader;
 import com.bsc301.util.References;
 import com.restfb.types.Post;
@@ -17,7 +18,9 @@ import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -56,7 +59,8 @@ public class GUI extends JFrame
     private JButton btnAnalyse = new JButton(References.STRING_BUTTON_ANALYSE_TEXT);
     
     // List
-    private JList lstPotentialPhobias = new JList();
+    private DefaultListModel dlmPotentialPhobias = new DefaultListModel();
+    private JList lstPotentialPhobias = new JList(dlmPotentialPhobias);
     
     // JTextArea
     private JTextArea txtHelpSuggestions = new JTextArea();
@@ -150,6 +154,7 @@ public class GUI extends JFrame
         DefaultButtonActionListener alButtons = new DefaultButtonActionListener();
         btnFacebookAuthToken.addActionListener(alButtons);
         btnTwitterUsername.addActionListener(alButtons);
+        btnAnalyse.addActionListener(alButtons);
         
         setAnalyseEnabled();
     }
@@ -192,6 +197,13 @@ public class GUI extends JFrame
                 Thread t = new Thread(new TwitterThread());
                 t.start();
             }
+            if(e.getSource() == btnAnalyse)
+            {
+                btnAnalyse.setText(References.STRING_BUTTON_LOADING_TEXT);
+                btnAnalyse.setEnabled(false);
+                Thread t = new Thread(new AnalyseThread());
+                t.start();
+            }
         }
         
         public class FacebookThread implements Runnable
@@ -201,17 +213,7 @@ public class GUI extends JFrame
             public void run()
             {
                 String authToken = txtFacebookAuthToken.getText();
-                List<Post> posts = FacebookLoader.GetInstance().GetFacebookJsonString(authToken);
-                List<String> sentences = SentenceSplitter.GetInstance().GenerateSentencesFromPosts(posts);
-                
-                for(int i = 1; i < sentences.size(); i++)
-                {
-                    String post = sentences.get(i - 1);
-                    txtHelpSuggestions.append("-------------------------------------------------------------------------------------------\n");
-                    txtHelpSuggestions.append("Sentence No: " + i + '\n');
-                    txtHelpSuggestions.append(post + '\n');
-                    txtHelpSuggestions.append("-------------------------------------------------------------------------------------------\n\n");
-                }
+                MasterLoader.GetInstance().LoadFacebook(authToken);
                 btnFacebookAuthToken.setText(References.STRING_BUTTON_READY_TEXT);
                 setAnalyseEnabled();
             }
@@ -224,32 +226,46 @@ public class GUI extends JFrame
             public void run()
             {
                 String username = txtTwitterUsername.getText();
-                List<Status> statuses = TwitterLoader.GetInstance().GetStatuses(username);
-                if(statuses == null)
-                {
-                    txtHelpSuggestions.append("Twitter failure");
-                }
-                else
-                {
-                    for (Status s : statuses) {
-                        List<Sentence> sentences = SentenceSplitter.GetInstance().GenerateSentencesFromPost(s);
-                        txtHelpSuggestions.append("Post: \n");
-                        for(int i = 1; i <= sentences.size(); i++)
-                        {
-                            Sentence status = sentences.get(i - 1);
-                            txtHelpSuggestions.append("    -------------------------------------------------------------------------------------------\n");
-                            txtHelpSuggestions.append("    Sentence No: " + i + '\n');
-                            txtHelpSuggestions.append("    " + status.text() + '\n');
-                            txtHelpSuggestions.append("    -------------------------------------------------------------------------------------------\n\n");
-                        }
-                    }
-                    
-                    
-                    
-                    
-                }
+                MasterLoader.GetInstance().LoadTwitter(username);
                 btnTwitterUsername.setText(References.STRING_BUTTON_READY_TEXT);
                 setAnalyseEnabled();
+            }
+        }
+        
+        public class AnalyseThread implements Runnable
+        {
+            @Override
+            public void run()
+            {
+                List<String> sentences = MasterLoader.GetInstance().GetAllLoadedSentences();
+                
+                // Give sentence list to keyword matcher.
+                
+                // Give matched sentences to sentiment analyser.
+                
+                // Get list of matched phobias.
+                // DEBUG - Dummy list
+                List<String> phobias = new ArrayList<String>();
+                phobias.addAll(Arrays.asList("Arachnophobia", "Chrometophobia", "Hadephobia"));
+                
+                // Add phobia list to GUI
+                for(String phobia : phobias)
+                {
+                    dlmPotentialPhobias.addElement(phobia);
+                }
+                
+                // Get Phobia Suggestions
+                txtHelpSuggestions.append("Seek help");
+                
+                /*for(int i = 1; i <= sentences.size(); i++)
+                {
+                    String post = sentences.get(i - 1);
+                    txtHelpSuggestions.append("-------------------------------------------------------------------------------------------\n");
+                    txtHelpSuggestions.append("Sentence No: " + i + '\n');
+                    txtHelpSuggestions.append(post + '\n');
+                    txtHelpSuggestions.append("-------------------------------------------------------------------------------------------\n\n");
+                }*/
+                btnAnalyse.setText(References.STRING_BUTTON_ANALYSE_TEXT);
             }
         }
         
