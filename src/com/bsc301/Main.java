@@ -5,10 +5,15 @@
  */
 package com.bsc301;
 
+import com.bsc301.analytical.MatchedPhobia;
+import com.bsc301.analytical.Phobia;
+import com.bsc301.analytical.PhobiaFactory;
 import com.bsc301.analytical.SentimentAnalyser;
 import com.bsc301.gui.GUI;
+import com.bsc301.analytical.WordMatcher;
 import com.bsc301.synonyms.DictionaryCreator;
 import java.io.File;
+import java.util.List;
 
 /**
  *
@@ -19,7 +24,7 @@ public class Main
     
     
     public static void main(String[] inputArgs)
-    {                
+    {   
         GUI gui = new GUI();
         gui.flipVisibility();
         

@@ -5,7 +5,11 @@
  */
 package com.bsc301.gui;
 
+import com.bsc301.analytical.MatchedPhobia;
+import com.bsc301.analytical.Phobia;
+import com.bsc301.analytical.PhobiaFactory;
 import com.bsc301.analytical.SentenceSplitter;
+import com.bsc301.analytical.WordMatcher;
 import com.bsc301.socialmedia.FacebookLoader;
 import com.bsc301.socialmedia.MasterLoader;
 import com.bsc301.socialmedia.TwitterLoader;
@@ -238,21 +242,30 @@ public class GUI extends JFrame
             public void run()
             {
                 List<String> sentences = MasterLoader.GetInstance().GetAllLoadedSentences();
+                List<Phobia> phobias = PhobiaFactory.CreatePhobias("input/phobias.json");
+                WordMatcher matcher = new WordMatcher(phobias);
                 
                 // Give sentence list to keyword matcher.
-                
-                // Give matched sentences to sentiment analyser.
-                
-                // Get list of matched phobias.
-                // DEBUG - Dummy list
-                List<String> phobias = new ArrayList<String>();
-                phobias.addAll(Arrays.asList("Arachnophobia", "Chrometophobia", "Hadephobia"));
-                
-                // Add phobia list to GUI
-                for(String phobia : phobias)
+                for(String sentence : sentences)
                 {
-                    dlmPotentialPhobias.addElement(phobia);
+                    List<MatchedPhobia> matches = matcher.FindMatchedPhobias(sentence);
+                    for(MatchedPhobia match : matches)
+                    {
+                        boolean matched = false;
+                        for(int i = 0; i < dlmPotentialPhobias.size(); i++)
+                        {
+                            if(dlmPotentialPhobias.get(i).equals(match.GetPhobia().GetPhobia()))
+                            {
+                                matched = true;
+                                break;
+                            }
+                        }
+                        if(!matched)
+                            dlmPotentialPhobias.addElement(match.GetPhobia().GetPhobia());
+                    }
                 }
+                
+                
                 
                 // Get Phobia Suggestions
                 txtHelpSuggestions.append("Seek help");
