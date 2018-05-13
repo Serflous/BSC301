@@ -142,9 +142,11 @@ public class DatamuseQuery {
         return s != null ? s.toString() : null;
     }
     
-    public String findRelSyn(String word,String topic) {
+    public String findRelSyn(String word,String phobia) {
         String s = word.replaceAll(" ", "+");
-        String t = topic.replaceAll(" ", "+");
-        return getJSON("http://api.datamuse.com/words?ml=" + s + "&topics=" + t);
+        String p = phobia.replaceAll(" ", "+");
+        System.out.println(s + " - " + p);
+        return getJSON("http://api.datamuse.com/words?ml=" + s + "&max=20");
     }
+    
 }

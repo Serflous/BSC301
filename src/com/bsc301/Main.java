@@ -25,11 +25,11 @@ public class Main
     
     public static void main(String[] inputArgs)
     {   
-        GUI gui = new GUI();
-        gui.flipVisibility();
+//        GUI gui = new GUI();
+//        gui.flipVisibility();
         
         // creates json file of phobia synonyms using datamuse thesaurus api.
-        //DictionaryCreator.run("input/phobias.json","output/phobia-keywords.json");
+        DictionaryCreator.run("input/phobias.json","output/phobia-keywords.json");
         
 //        SentimentAnalyser.init();
 //        String str1 = "I love spiders";

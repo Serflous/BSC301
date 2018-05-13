@@ -36,7 +36,7 @@ public class DictionaryCreator {
             List<String> synonyms = new ArrayList<>( ph.synonyms );
             
             for(String synonym: synonyms){
-                String result = datamuse.findRelSyn(synonym,ph.description);
+                String result = datamuse.findRelSyn(synonym,ph.name);
                 
                 String[] words = jsonparse.parseWords(result);
                 
