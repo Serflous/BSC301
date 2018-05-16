@@ -6,6 +6,7 @@
 package com.bsc301.analytical;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -39,6 +40,41 @@ public class Phobia
     public List<String> GetWords()
     {
         return m_words;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return m_phobia;
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        return m_phobia.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final Phobia other = (Phobia) obj;
+        if (!Objects.equals(this.m_phobia, other.m_phobia))
+        {
+            return false;
+        }
+        return true;
     }
     
     

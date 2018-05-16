@@ -7,23 +7,21 @@ package com.bsc301.gui;
 
 import com.bsc301.analytical.MatchedPhobia;
 import com.bsc301.analytical.Phobia;
+import com.bsc301.analytical.PhobiaCounts;
 import com.bsc301.analytical.PhobiaFactory;
-import com.bsc301.analytical.SentenceSplitter;
+import com.bsc301.analytical.SentimentAnalyser;
 import com.bsc301.analytical.WordMatcher;
-import com.bsc301.socialmedia.FacebookLoader;
 import com.bsc301.socialmedia.MasterLoader;
-import com.bsc301.socialmedia.TwitterLoader;
 import com.bsc301.util.References;
-import com.restfb.types.Post;
-import edu.stanford.nlp.simple.Sentence;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -34,10 +32,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SpringLayout;
-import twitter4j.ResponseList;
-import twitter4j.Status;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  *
@@ -156,9 +153,11 @@ public class GUI extends JFrame
         
         // Event listeners
         DefaultButtonActionListener alButtons = new DefaultButtonActionListener();
+        DefaultListChangeListener alList = new DefaultListChangeListener();
         btnFacebookAuthToken.addActionListener(alButtons);
         btnTwitterUsername.addActionListener(alButtons);
         btnAnalyse.addActionListener(alButtons);
+        lstPotentialPhobias.addListSelectionListener(alList);
         
         setAnalyseEnabled();
     }
@@ -180,6 +179,25 @@ public class GUI extends JFrame
         }
     }
     
+    
+    public class DefaultListChangeListener implements ListSelectionListener
+    {
+
+        @Override
+        public void valueChanged(ListSelectionEvent e)
+        {
+            if(!e.getValueIsAdjusting())
+            {
+                int idx = lstPotentialPhobias.getSelectedIndex();
+                PhobiaCounts phobia = (PhobiaCounts)dlmPotentialPhobias.getElementAt(idx);
+                String output = "Phobia: " + phobia.GetPhobia().GetPhobia() + "\n" +
+                                "Desc: " + phobia.GetPhobia().GetDescription() + "\n" +
+                                "Occurrences: " + phobia.GetCount();
+                txtHelpSuggestions.setText(output);
+            }
+        }
+        
+    }
     
     public class DefaultButtonActionListener implements ActionListener
     {
@@ -243,7 +261,10 @@ public class GUI extends JFrame
             {
                 List<String> sentences = MasterLoader.GetInstance().GetAllLoadedSentences();
                 List<Phobia> phobias = PhobiaFactory.CreatePhobias("input/phobias.json");
+                HashMap<Phobia, Integer> phobiaCounts = new HashMap<Phobia, Integer>();
+                SentimentAnalyser.init();
                 WordMatcher matcher = new WordMatcher(phobias);
+                
                 
                 // Give sentence list to keyword matcher.
                 for(String sentence : sentences)
@@ -251,33 +272,39 @@ public class GUI extends JFrame
                     List<MatchedPhobia> matches = matcher.FindMatchedPhobias(sentence);
                     for(MatchedPhobia match : matches)
                     {
-                        boolean matched = false;
-                        for(int i = 0; i < dlmPotentialPhobias.size(); i++)
+                        if(SentimentAnalyser.findSentiment(sentence) == 1)
                         {
-                            if(dlmPotentialPhobias.get(i).equals(match.GetPhobia().GetPhobia()))
+                            /*boolean matched = false;
+                            for(int i = 0; i < dlmPotentialPhobias.size(); i++)
                             {
-                                matched = true;
-                                break;
+                                if(dlmPotentialPhobias.get(i).equals(match.GetPhobia().GetPhobia()))
+                                {
+                                    matched = true;
+                                    break;
+                                }
                             }
+                            if(!matched)
+                                dlmPotentialPhobias.addElement(match.GetPhobia().GetPhobia());*/
+                            int count = 1;
+                            if(phobiaCounts.containsKey(match.GetPhobia()))
+                            {
+                                count = phobiaCounts.get(match.GetPhobia());
+                                count++;
+                            }
+                            phobiaCounts.put(match.GetPhobia(), count);
+                            
                         }
-                        if(!matched)
-                            dlmPotentialPhobias.addElement(match.GetPhobia().GetPhobia());
                     }
                 }
                 
-                
-                
-                // Get Phobia Suggestions
-                txtHelpSuggestions.append("Seek help");
-                
-                /*for(int i = 1; i <= sentences.size(); i++)
+                Iterator iter = phobiaCounts.entrySet().iterator();
+                while(iter.hasNext())
                 {
-                    String post = sentences.get(i - 1);
-                    txtHelpSuggestions.append("-------------------------------------------------------------------------------------------\n");
-                    txtHelpSuggestions.append("Sentence No: " + i + '\n');
-                    txtHelpSuggestions.append(post + '\n');
-                    txtHelpSuggestions.append("-------------------------------------------------------------------------------------------\n\n");
-                }*/
+                    Map.Entry pair = (Map.Entry)iter.next();
+                    PhobiaCounts phobia = new PhobiaCounts((Phobia)pair.getKey(), (int)pair.getValue());
+                    dlmPotentialPhobias.addElement(phobia);
+                }
+                
                 btnAnalyse.setText(References.STRING_BUTTON_ANALYSE_TEXT);
             }
         }

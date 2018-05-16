@@ -25,17 +25,17 @@ public class Main
     
     public static void main(String[] inputArgs)
     {   
-//        GUI gui = new GUI();
-//        gui.flipVisibility();
+        GUI gui = new GUI();
+        gui.flipVisibility();
         
         // creates json file of phobia synonyms using datamuse thesaurus api.
-        DictionaryCreator.run("input/phobias.json","output/phobia-keywords.json");
+        //DictionaryCreator.run("input/phobias.json","output/phobia-keywords.json");
         
-//        SentimentAnalyser.init();
-//        String str1 = "I love spiders";
-//        String str2 = "I hate spiders";
-//        System.out.println(str1 + " : " + SentimentAnalyser.findSentiment(str1));
-//        System.out.println(str2 + " : " + SentimentAnalyser.findSentiment(str2));
+        //SentimentAnalyser.init();
+        //String str1 = "I love spiders";
+        //String str2 = "I hate spiders";
+        //System.out.println(str1 + " : " + SentimentAnalyser.findSentiment(str1));
+        //System.out.println(str2 + " : " + SentimentAnalyser.findSentiment(str2));
     }
     
     
