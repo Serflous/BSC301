@@ -272,7 +272,7 @@ public class GUI extends JFrame
                     List<MatchedPhobia> matches = matcher.FindMatchedPhobias(sentence);
                     for(MatchedPhobia match : matches)
                     {
-                        if(SentimentAnalyser.findSentiment(sentence) == 1)
+                        if(SentimentAnalyser.findSentiment(sentence) <= 1)
                         {
                             /*boolean matched = false;
                             for(int i = 0; i < dlmPotentialPhobias.size(); i++)

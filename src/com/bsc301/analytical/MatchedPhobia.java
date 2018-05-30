@@ -15,11 +15,13 @@ public class MatchedPhobia
     
     private Phobia m_phobia;
     private String m_sentence;
+    private String m_matchedWord;
     
-    public MatchedPhobia(Phobia phobia, String sentence)
+    public MatchedPhobia(Phobia phobia, String sentence, String matchedWord)
     {
         m_phobia = phobia;
         m_sentence = sentence;
+        m_matchedWord = matchedWord;
     }
     
     public Phobia GetPhobia()
@@ -30,6 +32,11 @@ public class MatchedPhobia
     public String GetSentence()
     {
         return m_sentence;
+    }
+    
+    public String GetMatchedWord()
+    {
+        return m_matchedWord;
     }
     
     

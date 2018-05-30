@@ -43,9 +43,9 @@ public class WordMatcher
                     {
                         if(LevenshteinDistance(word.toLowerCase(), phobiaWord) <= 1)
                         {
-                            MatchedPhobia match = new MatchedPhobia(phobia, sentence);
+                            MatchedPhobia match = new MatchedPhobia(phobia, sentence, word);
                             matchedPhobias.add(match);
-                            System.out.println(sentence + " -> " + phobia.GetPhobia());
+                            //System.out.println(sentence + " -> " + phobia.GetPhobia());
                         }
                     }
                 }
